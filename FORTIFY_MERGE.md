@@ -29,3 +29,7 @@ yarn build:packages
 ```
 
 Rebuild after any change under `packages/excalidraw` before refreshing a Fortify app that uses `file:`.
+
+## iPad / touch
+
+Fortify passes `detectScroll` on `<Excalidraw />`. After releases, smoke-test the whiteboard modal on iPad Safari (pan, pen, eraser over strokes vs question snapshot images).
