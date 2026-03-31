@@ -731,5 +731,9 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Scroll wheel"
+  },
+  "fortifyWhiteboard": {
+    "styleToggle": "Styles",
+    "noStyleOptionsHint": "Choose a drawing tool or select something on the canvas to change colors and stroke."
   }
 }

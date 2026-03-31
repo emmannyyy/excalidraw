@@ -2,6 +2,7 @@ import clsx from "clsx";
 
 import { actionShortcuts } from "../../actions";
 import { useTunnels } from "../../context/tunnels";
+import { useAppProps } from "../App";
 import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
@@ -22,6 +23,7 @@ const Footer = ({
   renderWelcomeScreen: boolean;
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
+  const appProps = useAppProps();
 
   return (
     <footer
@@ -41,7 +43,7 @@ const Footer = ({
               zoom={appState.zoom}
             />
 
-            {!appState.viewModeEnabled && (
+            {!appState.viewModeEnabled && !appProps.fortifyWhiteboard && (
               <UndoRedoActions
                 renderAction={actionManager.renderAction}
                 className={clsx("zen-mode-transition", {

@@ -13,17 +13,21 @@ import {
   EraserIcon,
   laserPointerToolIcon,
   handIcon,
+  LassoIcon,
 } from "./icons";
 
 import type { AppClassProperties } from "../types";
 
-/** Main dock tools when `fortifyWhiteboard` is enabled on `<Excalidraw />`. */
-export const FORTIFY_TOOLBAR_VALUES = new Set<string>([
-  "hand",
+/** Main dock tools when `fortifyWhiteboard` is enabled (hand is rendered separately in LayerUI). */
+export const FORTIFY_TOOLBAR_ORDER_NO_HAND = [
   "selection",
+  "lasso",
   "freedraw",
   "eraser",
-]);
+  "line",
+  "arrow",
+  "image",
+] as const;
 
 export const SHAPES = [
   {
@@ -124,7 +128,35 @@ export const SHAPES = [
   },
 ] as const;
 
+type ToolbarShape = (typeof SHAPES)[number];
+
+const getFortifyToolbarToolsWithoutHand = (): ToolbarShape[] => {
+  const list: ToolbarShape[] = [];
+  for (const value of FORTIFY_TOOLBAR_ORDER_NO_HAND) {
+    if (value === "lasso") {
+      list.push({
+        icon: LassoIcon,
+        value: "lasso",
+        key: KEYS.V,
+        numericKey: null,
+        fillable: true,
+        toolbar: true,
+      } as unknown as ToolbarShape);
+      continue;
+    }
+    const found = SHAPES.find((s) => s.value === value);
+    if (found) {
+      list.push(found);
+    }
+  }
+  return list;
+};
+
 export const getToolbarTools = (app: AppClassProperties) => {
+  if (app.props.fortifyWhiteboard) {
+    return getFortifyToolbarToolsWithoutHand();
+  }
+
   const tools =
     app.state.preferredSelectionTool.type === "lasso"
       ? ([
@@ -140,14 +172,21 @@ export const getToolbarTools = (app: AppClassProperties) => {
         ] as const)
       : SHAPES;
 
-  if (app.props.fortifyWhiteboard) {
-    return tools.filter((shape) => FORTIFY_TOOLBAR_VALUES.has(shape.value));
-  }
-
   return tools;
 };
 
 export const findShapeByKey = (key: string, app: AppClassProperties) => {
+  if (app.props.fortifyWhiteboard) {
+    const handShape = SHAPES[0];
+    if (
+      handShape.key &&
+      (typeof handShape.key === "string"
+        ? handShape.key === key
+        : (handShape.key as readonly string[]).includes(key))
+    ) {
+      return "hand";
+    }
+  }
   const shape = getToolbarTools(app).find((shape, index) => {
     return (
       (shape.numericKey != null && key === shape.numericKey.toString()) ||

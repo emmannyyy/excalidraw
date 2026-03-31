@@ -800,6 +800,42 @@ body.excalidraw-cursor-resize * {
       font-size: 0.8em;
     }
   }
+
+  /* Fortify embed: stable top bar layout across viewport widths; scrollable tool row when needed */
+  &.excalidraw--fortify-whiteboard {
+    .App-menu_top {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-gap: 1rem;
+
+      @media (min-width: 1536px) {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-gap: 1rem;
+      }
+    }
+
+    .shapes-section {
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .App-toolbar-container {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .App-toolbar {
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+
+      .Stack.Stack_horizontal {
+        flex-wrap: nowrap;
+        width: max-content;
+        max-width: none;
+      }
+    }
+  }
 }
 
 .excalidraw__embeddable-container {

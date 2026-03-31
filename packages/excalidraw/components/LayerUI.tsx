@@ -31,6 +31,8 @@ import {
   SelectedShapeActions,
   ShapesSwitcher,
   CompactShapeActions,
+  UndoRedoActions,
+  FortifyHandToolButton,
 } from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
 import { LockButton } from "./LockButton";
@@ -46,7 +48,8 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
-import { sidebarRightIcon } from "./icons";
+import { sidebarRightIcon, adjustmentsIcon } from "./icons";
+import { ToolButton } from "./ToolButton";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
@@ -235,13 +238,49 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => {
-    const isCompactMode = isCompactStylesPanel;
+    const fortifyWB = Boolean(app.props.fortifyWhiteboard);
+    /** Zen mode normally slides the properties column off-screen; keep it visible when Fortify user opens Styles. */
+    const hideShapeActionsForZen =
+      appState.zenModeEnabled &&
+      !(fortifyWB && appState.openFortifyStylesPanel);
+    const isCompactMode = isCompactStylesPanel && !fortifyWB;
+    const canShowShapeActions = showSelectedShapeActions(appState, elements);
+
+    if (fortifyWB && appState.openFortifyStylesPanel && !canShowShapeActions) {
+      return (
+        <Section
+          heading="selectedShapeActions"
+          className={clsx("selected-shape-actions zen-mode-transition", {
+            "transition-left": hideShapeActionsForZen,
+          })}
+        >
+          <Island
+            className={CLASSES.SHAPE_ACTIONS_MENU}
+            padding={2}
+            style={{
+              maxHeight: `${appState.height - 166}px`,
+            }}
+          >
+            <div
+              style={{
+                padding: "0.5rem",
+                fontSize: "0.75rem",
+                color: "var(--text-primary-color)",
+                maxWidth: "12rem",
+              }}
+            >
+              {t("fortifyWhiteboard.noStyleOptionsHint")}
+            </div>
+          </Island>
+        </Section>
+      );
+    }
 
     return (
       <Section
         heading="selectedShapeActions"
         className={clsx("selected-shape-actions zen-mode-transition", {
-          "transition-left": appState.zenModeEnabled,
+          "transition-left": hideShapeActionsForZen,
         })}
       >
         {isCompactMode ? (
@@ -285,10 +324,9 @@ const LayerUI = ({
   };
 
   const renderFixedSideContainer = () => {
-    const shouldRenderSelectedShapeActions = showSelectedShapeActions(
-      appState,
-      elements,
-    );
+    const shouldRenderSelectedShapeActions = app.props.fortifyWhiteboard
+      ? appState.openFortifyStylesPanel
+      : showSelectedShapeActions(appState, elements);
 
     const shouldShowStats =
       appState.stats.open &&
@@ -307,7 +345,7 @@ const LayerUI = ({
             <div
               className={clsx("selected-shape-actions-container", {
                 "selected-shape-actions-container--compact":
-                  isCompactStylesPanel,
+                  isCompactStylesPanel && !app.props.fortifyWhiteboard,
               })}
             >
               {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
@@ -332,7 +370,9 @@ const LayerUI = ({
                           padding={spacing.islandPadding}
                           className={clsx("App-toolbar", {
                             "zen-mode": appState.zenModeEnabled,
-                            "App-toolbar--compact": isCompactStylesPanel,
+                            "App-toolbar--compact":
+                              isCompactStylesPanel &&
+                              !app.props.fortifyWhiteboard,
                           })}
                         >
                           <HintViewer
@@ -343,27 +383,71 @@ const LayerUI = ({
                           />
                           {heading}
                           <Stack.Row gap={spacing.toolbarInnerRowGap}>
-                            <PenModeButton
-                              zenModeEnabled={appState.zenModeEnabled}
-                              checked={appState.penMode}
-                              onChange={() => onPenModeToggle(null)}
-                              title={t("toolBar.penMode")}
-                              penDetected={appState.penDetected}
-                            />
-                            <LockButton
-                              checked={appState.activeTool.locked}
-                              onChange={onLockToggle}
-                              title={t("toolBar.lock")}
-                            />
+                            {app.props.fortifyWhiteboard ? (
+                              <>
+                                <FortifyHandToolButton
+                                  app={app}
+                                  activeTool={appState.activeTool}
+                                  setAppState={setAppState}
+                                  UIOptions={UIOptions}
+                                />
+                                <LockButton
+                                  checked={appState.activeTool.locked}
+                                  onChange={onLockToggle}
+                                  title={t("toolBar.lock")}
+                                />
+                                <div className="App-toolbar__divider" />
+                                <ShapesSwitcher
+                                  setAppState={setAppState}
+                                  activeTool={appState.activeTool}
+                                  UIOptions={UIOptions}
+                                  app={app}
+                                />
+                                <div className="App-toolbar__divider" />
+                                <ToolButton
+                                  type="icon"
+                                  icon={adjustmentsIcon}
+                                  title={t("fortifyWhiteboard.styleToggle")}
+                                  aria-label={t("fortifyWhiteboard.styleToggle")}
+                                  selected={appState.openFortifyStylesPanel}
+                                  onClick={() =>
+                                    setAppState((s) => ({
+                                      openFortifyStylesPanel:
+                                        !s.openFortifyStylesPanel,
+                                    }))
+                                  }
+                                />
+                                <div className="App-toolbar__divider" />
+                                <UndoRedoActions
+                                  renderAction={actionManager.renderAction}
+                                  className="fortify-toolbar-undo-redo"
+                                />
+                              </>
+                            ) : (
+                              <>
+                                <PenModeButton
+                                  zenModeEnabled={appState.zenModeEnabled}
+                                  checked={appState.penMode}
+                                  onChange={() => onPenModeToggle(null)}
+                                  title={t("toolBar.penMode")}
+                                  penDetected={appState.penDetected}
+                                />
+                                <LockButton
+                                  checked={appState.activeTool.locked}
+                                  onChange={onLockToggle}
+                                  title={t("toolBar.lock")}
+                                />
 
-                            <div className="App-toolbar__divider" />
+                                <div className="App-toolbar__divider" />
 
-                            <ShapesSwitcher
-                              setAppState={setAppState}
-                              activeTool={appState.activeTool}
-                              UIOptions={UIOptions}
-                              app={app}
-                            />
+                                <ShapesSwitcher
+                                  setAppState={setAppState}
+                                  activeTool={appState.activeTool}
+                                  UIOptions={UIOptions}
+                                  app={app}
+                                />
+                              </>
+                            )}
                           </Stack.Row>
                         </Island>
                         {isCollaborating && (

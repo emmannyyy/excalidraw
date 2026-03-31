@@ -414,6 +414,8 @@ export interface AppState {
     duration?: number;
   } | null;
   zenModeEnabled: boolean;
+  /** Fortify embed: user toggled the styling (properties) panel via toolbar */
+  openFortifyStylesPanel: boolean;
   theme: Theme;
   /** grid cell px size */
   gridSize: number;

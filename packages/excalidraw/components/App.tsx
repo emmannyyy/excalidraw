@@ -110,6 +110,8 @@ import {
   setDesktopUIMode,
   isSelectionLikeTool,
   oneOf,
+  STROKE_WIDTH,
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
 } from "@excalidraw/common";
 
 import {
@@ -567,8 +569,14 @@ export const useApp = () => useContext(AppContext);
 export const useAppProps = () => useContext(AppPropsContext);
 export const useEditorInterface = () =>
   useContext<EditorInterface>(EditorInterfaceContext);
-export const useStylesPanelMode = () =>
-  deriveStylesPanelMode(useEditorInterface());
+export const useStylesPanelMode = (): StylesPanelMode => {
+  const editorInterface = useEditorInterface();
+  const appProps = useContext(AppPropsContext);
+  if (appProps.fortifyWhiteboard) {
+    return "full";
+  }
+  return deriveStylesPanelMode(editorInterface);
+};
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 export const useExcalidrawElements = () =>
@@ -810,6 +818,15 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
     };
+
+    if (props.fortifyWhiteboard) {
+      this.state = {
+        ...this.state,
+        currentItemStrokeWidth: STROKE_WIDTH.thin,
+        currentItemStrokeColor:
+          COLOR_PALETTE.blue[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
+      };
+    }
 
     this.refreshEditorInterface();
     this.stylesPanelMode = deriveStylesPanelMode(this.editorInterface);
@@ -2110,6 +2127,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.viewModeEnabled ||
             this.state.openDialog?.name === "elementLinkSelector",
           "excalidraw--mobile": this.editorInterface.formFactor === "phone",
+          "excalidraw--fortify-whiteboard": this.props.fortifyWhiteboard,
         })}
         style={{
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
@@ -2956,6 +2974,22 @@ class App extends React.Component<AppProps, AppState> {
       };
     }
 
+    if (this.props.fortifyWhiteboard) {
+      const incomingAppState = initialData?.appState;
+      const hasExplicitStrokeWidth =
+        incomingAppState != null &&
+        typeof incomingAppState === "object" &&
+        "currentItemStrokeWidth" in incomingAppState;
+      if (!hasExplicitStrokeWidth) {
+        restoredAppState = {
+          ...restoredAppState,
+          currentItemStrokeWidth: STROKE_WIDTH.thin,
+          currentItemStrokeColor:
+            COLOR_PALETTE.blue[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
+        };
+      }
+    }
+
     this.resetStore();
     this.resetHistory();
     this.syncActionResult({
@@ -2980,10 +3014,16 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getFormFactor = (editorWidth: number, editorHeight: number) => {
-    return (
+    const ff =
       this.props.UIOptions.getFormFactor?.(editorWidth, editorHeight) ??
-      getFormFactor(editorWidth, editorHeight)
-    );
+      getFormFactor(editorWidth, editorHeight);
+    if (
+      this.props.fortifyWhiteboard &&
+      (ff === "tablet" || ff === "phone")
+    ) {
+      return "desktop";
+    }
+    return ff;
   };
 
   public refreshEditorInterface = () => {

@@ -51,7 +51,7 @@ import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
-import { getToolbarTools } from "./shapes";
+import { getToolbarTools, SHAPES } from "./shapes";
 
 import "./Actions.scss";
 
@@ -1038,6 +1038,57 @@ export const MobileShapeActions = ({
   );
 };
 
+export const FortifyHandToolButton = ({
+  app,
+  activeTool,
+  setAppState: _setAppState,
+  UIOptions,
+}: {
+  activeTool: UIAppState["activeTool"];
+  setAppState: React.Component<any, AppState>["setState"];
+  app: AppClassProperties;
+  UIOptions: AppProps["UIOptions"];
+}) => {
+  const handShape = SHAPES[0];
+  if (handShape.value !== "hand") {
+    return null;
+  }
+  const { value, icon, key, fillable, numericKey } = handShape;
+  if ((UIOptions.tools as Record<string, boolean> | undefined)?.hand === false) {
+    return null;
+  }
+  const label = t(`toolBar.${value}`);
+  const letter =
+    key && capitalizeString(typeof key === "string" ? key : key[0]);
+  const shortcut = letter
+    ? `${letter} ${t("helpDialog.or")} ${numericKey}`
+    : `${numericKey}`;
+  return (
+    <ToolButton
+      className={clsx("Shape", { fillable })}
+      type="radio"
+      icon={icon}
+      checked={activeTool.type === value}
+      name="editor-current-shape"
+      title={`${capitalizeString(label)} — ${shortcut}`}
+      aria-label={capitalizeString(label)}
+      aria-keyshortcuts={shortcut}
+      data-testid={`toolbar-${value}`}
+      onPointerDown={({ pointerType }) => {
+        if (!app.state.penDetected && pointerType === "pen") {
+          app.togglePenMode(true);
+        }
+      }}
+      onChange={() => {
+        if (app.state.activeTool.type !== value) {
+          trackEvent("toolbar", value, "ui");
+        }
+        app.setActiveTool({ type: "hand" });
+      }}
+    />
+  );
+};
+
 export const ShapesSwitcher = ({
   activeTool,
   setAppState,
@@ -1053,6 +1104,7 @@ export const ShapesSwitcher = ({
   const stylesPanelMode = useStylesPanelMode();
   const isFullStylesPanel = stylesPanelMode === "full";
   const isCompactStylesPanel = stylesPanelMode === "compact";
+  const isFortifyWB = Boolean(app.props.fortifyWhiteboard);
 
   const SELECTION_TOOLS = [
     {
@@ -1106,6 +1158,7 @@ export const ShapesSwitcher = ({
           // when in compact styles panel mode (tablet)
           // use a ToolPopover for selection/lasso toggle as well
           if (
+            !isFortifyWB &&
             (value === "selection" || value === "lasso") &&
             isCompactStylesPanel
           ) {
@@ -1156,7 +1209,7 @@ export const ShapesSwitcher = ({
                   app.togglePenMode(true);
                 }
 
-                if (value === "selection") {
+                if (!isFortifyWB && value === "selection") {
                   if (app.state.activeTool.type === "selection") {
                     app.setActiveTool({ type: "lasso" });
                   } else {
@@ -1167,6 +1220,23 @@ export const ShapesSwitcher = ({
               onChange={({ pointerType }) => {
                 if (app.state.activeTool.type !== value) {
                   trackEvent("toolbar", value, "ui");
+                }
+                if (isFortifyWB && value === "selection") {
+                  app.setActiveTool({ type: "selection" });
+                  setAppState({
+                    preferredSelectionTool: {
+                      type: "selection",
+                      initialized: true,
+                    },
+                  });
+                  return;
+                }
+                if (isFortifyWB && value === "lasso") {
+                  app.setActiveTool({ type: "lasso" });
+                  setAppState({
+                    preferredSelectionTool: { type: "lasso", initialized: true },
+                  });
+                  return;
                 }
                 if (value === "image") {
                   app.setActiveTool({
@@ -1180,9 +1250,11 @@ export const ShapesSwitcher = ({
           );
         },
       )}
-      <div className="App-toolbar__divider" />
+      {!isFortifyWB && (
+        <>
+          <div className="App-toolbar__divider" />
 
-      <DropdownMenu open={isExtraToolsMenuOpen}>
+          <DropdownMenu open={isExtraToolsMenuOpen}>
         <DropdownMenu.Trigger
           className={clsx("App-toolbar__extra-tools-trigger", {
             "App-toolbar__extra-tools-trigger--selected":
@@ -1274,6 +1346,8 @@ export const ShapesSwitcher = ({
           )}
         </DropdownMenu.Content>
       </DropdownMenu>
+        </>
+      )}
     </>
   );
 };
