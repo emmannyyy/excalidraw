@@ -19,3 +19,13 @@ yarn build:packages
 ```
 
 Then point Fortify at `packages/excalidraw` via `file:` or publish `@emmannyyy/excalidraw`.
+
+## Build command (monorepo root)
+
+```bash
+cd /Users/emmanuel/excalidraw
+yarn install
+yarn build:packages
+```
+
+Rebuild after any change under `packages/excalidraw` before refreshing a Fortify app that uses `file:`.

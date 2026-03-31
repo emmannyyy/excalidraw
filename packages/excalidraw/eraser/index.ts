@@ -39,6 +39,12 @@ import type { AnimationFrameHandler } from "../animation-frame-handler";
 
 import type App from "../components/App";
 
+const isFortifySkippedImage = (
+  element: ExcalidrawElement,
+  app: App,
+): boolean =>
+  Boolean(app.props.fortifyWhiteboard && element.type === "image");
+
 export class EraserTrail extends AnimatedTrail {
   private elementsToErase: Set<ExcalidrawElement["id"]> = new Set();
   private groupsToErase: Set<ExcalidrawElement["id"]> = new Set();
@@ -101,7 +107,7 @@ export class EraserTrail extends AnimatedTrail {
     );
 
     const candidateElements = this.app.visibleElements.filter(
-      (el) => !el.locked,
+      (el) => !el.locked && !isFortifySkippedImage(el, this.app),
     );
 
     const candidateElementsMap = arrayToMap(candidateElements);
@@ -162,7 +168,9 @@ export class EraserTrail extends AnimatedTrail {
             );
 
             for (const elementInGroup of elementsInGroup) {
-              this.elementsToErase.add(elementInGroup.id);
+              if (!isFortifySkippedImage(elementInGroup, this.app)) {
+                this.elementsToErase.add(elementInGroup.id);
+              }
             }
             this.groupsToErase.add(shallowestGroupId);
           }

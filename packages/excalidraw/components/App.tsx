@@ -11034,9 +11034,15 @@ class App extends React.Component<AppProps, AppState> {
             scenePointer.x,
             scenePointer.y,
           );
-          hitElements.forEach((hitElement) =>
-            this.elementsPendingErasure.add(hitElement.id),
-          );
+          hitElements.forEach((hitElement) => {
+            if (
+              this.props.fortifyWhiteboard &&
+              hitElement.type === "image"
+            ) {
+              return;
+            }
+            this.elementsPendingErasure.add(hitElement.id);
+          });
         }
         this.eraseElements();
         return;

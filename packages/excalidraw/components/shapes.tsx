@@ -17,6 +17,14 @@ import {
 
 import type { AppClassProperties } from "../types";
 
+/** Main dock tools when `fortifyWhiteboard` is enabled on `<Excalidraw />`. */
+export const FORTIFY_TOOLBAR_VALUES = new Set<string>([
+  "hand",
+  "selection",
+  "freedraw",
+  "eraser",
+]);
+
 export const SHAPES = [
   {
     icon: handIcon,
@@ -117,19 +125,26 @@ export const SHAPES = [
 ] as const;
 
 export const getToolbarTools = (app: AppClassProperties) => {
-  return app.state.preferredSelectionTool.type === "lasso"
-    ? ([
-        {
-          value: "lasso",
-          icon: SelectionIcon,
-          key: KEYS.V,
-          numericKey: KEYS["1"],
-          fillable: true,
-          toolbar: true,
-        },
-        ...SHAPES.slice(1),
-      ] as const)
-    : SHAPES;
+  const tools =
+    app.state.preferredSelectionTool.type === "lasso"
+      ? ([
+          {
+            value: "lasso",
+            icon: SelectionIcon,
+            key: KEYS.V,
+            numericKey: KEYS["1"],
+            fillable: true,
+            toolbar: true,
+          },
+          ...SHAPES.slice(1),
+        ] as const)
+      : SHAPES;
+
+  if (app.props.fortifyWhiteboard) {
+    return tools.filter((shape) => FORTIFY_TOOLBAR_VALUES.has(shape.value));
+  }
+
+  return tools;
 };
 
 export const findShapeByKey = (key: string, app: AppClassProperties) => {

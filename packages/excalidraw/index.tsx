@@ -98,9 +98,15 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     aiEnabled,
     showDeprecatedFonts,
     renderScrollbars,
+    fortifyWhiteboard,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
+
+  const effectiveZenModeEnabled =
+    typeof zenModeEnabled === "undefined" && fortifyWhiteboard
+      ? true
+      : zenModeEnabled;
 
   // FIXME normalize/set defaults in parent component so that the memo resolver
   // compares the same values
@@ -184,7 +190,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}
-          zenModeEnabled={zenModeEnabled}
+          zenModeEnabled={effectiveZenModeEnabled}
           gridModeEnabled={gridModeEnabled}
           libraryReturnUrl={libraryReturnUrl}
           theme={theme}
@@ -208,6 +214,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
           renderScrollbars={renderScrollbars}
+          fortifyWhiteboard={fortifyWhiteboard}
         >
           {children}
         </App>

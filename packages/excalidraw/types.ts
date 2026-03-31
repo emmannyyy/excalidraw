@@ -697,6 +697,12 @@ export interface ExcalidrawProps {
       signal: AbortSignal;
     },
   ) => MaybePromise<void> | AsyncGenerator<OnExportProgress, void>;
+  /**
+   * Fortify / minimal whiteboard embed: hand, selection, pen (freedraw), eraser
+   * only; default zen when `zenModeEnabled` is omitted (less sticky properties
+   * dock); eraser does not delete `image` elements (e.g. pasted question snapshots).
+   */
+  fortifyWhiteboard?: boolean;
 }
 
 export type SceneData = {
