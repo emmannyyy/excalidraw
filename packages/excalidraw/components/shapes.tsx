@@ -26,6 +26,7 @@ export const FORTIFY_TOOLBAR_ORDER_NO_HAND = [
   "eraser",
   "line",
   "arrow",
+  "text",
   "image",
 ] as const;
 
