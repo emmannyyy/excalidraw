@@ -27,6 +27,8 @@ export declare const RectangleIcon: import("react/jsx-runtime").JSX.Element;
 export declare const DiamondIcon: import("react/jsx-runtime").JSX.Element;
 export declare const EllipseIcon: import("react/jsx-runtime").JSX.Element;
 export declare const ArrowIcon: import("react/jsx-runtime").JSX.Element;
+/** Fortify whiteboard: same stroke, arrowheads at both ends (toolbar second arrow). */
+export declare const FortifyDoubleArrowIcon: import("react/jsx-runtime").JSX.Element;
 export declare const LineIcon: import("react/jsx-runtime").JSX.Element;
 export declare const PenModeIcon: import("react/jsx-runtime").JSX.Element;
 export declare const FreedrawIcon: import("react/jsx-runtime").JSX.Element;

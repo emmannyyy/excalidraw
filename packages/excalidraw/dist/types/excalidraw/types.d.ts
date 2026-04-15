@@ -84,7 +84,9 @@ export type BinaryFileData = {
 };
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
-export type ToolType = "selection" | "lasso" | "rectangle" | "diamond" | "ellipse" | "arrow" | "line" | "freedraw" | "text" | "image" | "eraser" | "hand" | "frame" | "magicframe" | "embeddable" | "laser";
+export type ToolType = "selection" | "lasso" | "rectangle" | "diamond" | "ellipse" | "arrow"
+/** Fortify embed only: selects the arrow tool with heads on both ends (see App.setActiveTool). */
+ | "fortifyArrowDouble" | "line" | "freedraw" | "text" | "image" | "eraser" | "hand" | "frame" | "magicframe" | "embeddable" | "laser";
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 export type ActiveTool = {
     type: ToolType;

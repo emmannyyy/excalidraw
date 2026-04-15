@@ -5540,7 +5540,38 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const nextActiveTool = updateActiveTool(this.state, tool);
+    /** Fortify: second arrow icon — same linear tool, preset both arrowheads. */
+    let effectiveTool = tool;
+    let fortifyArrowHeadPreset: "single" | "double" | null = null;
+    if (
+      tool.type !== "custom" &&
+      this.props.fortifyWhiteboard &&
+      tool.type === "fortifyArrowDouble"
+    ) {
+      effectiveTool = { ...tool, type: "arrow" };
+      fortifyArrowHeadPreset = "double";
+    } else if (
+      tool.type !== "custom" &&
+      this.props.fortifyWhiteboard &&
+      tool.type === "arrow"
+    ) {
+      fortifyArrowHeadPreset = "single";
+    }
+
+    const fortifyArrowHeads =
+      this.props.fortifyWhiteboard && fortifyArrowHeadPreset === "double"
+        ? {
+            currentItemStartArrowhead: "arrow" as const,
+            currentItemEndArrowhead: "arrow" as const,
+          }
+        : this.props.fortifyWhiteboard && fortifyArrowHeadPreset === "single"
+          ? {
+              currentItemStartArrowhead: null,
+              currentItemEndArrowhead: "arrow" as const,
+            }
+          : {};
+
+    const nextActiveTool = updateActiveTool(this.state, effectiveTool);
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
@@ -5577,6 +5608,7 @@ class App extends React.Component<AppProps, AppState> {
         return {
           ...prevState,
           ...commonResets,
+          ...fortifyArrowHeads,
           activeTool: nextActiveTool,
           ...(keepSelection
             ? {}
@@ -5591,6 +5623,7 @@ class App extends React.Component<AppProps, AppState> {
         return {
           ...prevState,
           ...commonResets,
+          ...fortifyArrowHeads,
           activeTool: nextActiveTool,
           selectedElementIds: makeNextSelectedElementIds({}, prevState),
           selectedGroupIds: makeNextSelectedElementIds({}, prevState),
@@ -5601,6 +5634,7 @@ class App extends React.Component<AppProps, AppState> {
       return {
         ...prevState,
         ...commonResets,
+        ...fortifyArrowHeads,
         activeTool: nextActiveTool,
       };
     });
@@ -7883,11 +7917,16 @@ class App extends React.Component<AppProps, AppState> {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
-      this.state.activeTool.type === "line"
+      this.state.activeTool.type === "line" ||
+      this.state.activeTool.type === "fortifyArrowDouble"
     ) {
+      const linearToolType =
+        this.state.activeTool.type === "fortifyArrowDouble"
+          ? "arrow"
+          : this.state.activeTool.type;
       this.handleLinearElementOnPointerDown(
         event,
-        this.state.activeTool.type,
+        linearToolType,
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "freedraw") {

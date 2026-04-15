@@ -109,6 +109,7 @@ export const AllowedExcalidrawActiveTools: Record<
   line: true,
   image: true,
   arrow: true,
+  fortifyArrowDouble: true,
   freedraw: true,
   eraser: false,
   custom: true,

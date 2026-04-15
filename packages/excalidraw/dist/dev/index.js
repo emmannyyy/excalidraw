@@ -65,13 +65,13 @@ import {
   serializeAsJSON,
   serializeLibraryAsJSON,
   strokeRectWithRotation_simple
-} from "./chunk-2HWB65ZT.js";
+} from "./chunk-IUA2G4G6.js";
 import {
   define_import_meta_env_default
 } from "./chunk-UKZFTPBI.js";
 import {
   en_default
-} from "./chunk-FLLHPF7Y.js";
+} from "./chunk-F5SIG3ZF.js";
 import {
   percentages_default
 } from "./chunk-URPEKBQ3.js";
@@ -397,7 +397,7 @@ var globImport_locales_json = __glob({
   "./locales/de-CH.json": () => import("./locales/de-CH-GCXOD4LK.js"),
   "./locales/de-DE.json": () => import("./locales/de-DE-CGDBECYD.js"),
   "./locales/el-GR.json": () => import("./locales/el-GR-G5QZC24A.js"),
-  "./locales/en.json": () => import("./locales/en-LQNCIZDT.js"),
+  "./locales/en.json": () => import("./locales/en-EH6JXYLH.js"),
   "./locales/es-ES.json": () => import("./locales/es-ES-UMEOH76W.js"),
   "./locales/eu-ES.json": () => import("./locales/eu-ES-IWRZXJC5.js"),
   "./locales/fa-IR.json": () => import("./locales/fa-IR-QOYVIIJA.js"),
@@ -911,6 +911,17 @@ var ArrowIcon = createIcon(
   /* @__PURE__ */ jsxs("g", { strokeWidth: "1.5", children: [
     /* @__PURE__ */ jsx("path", { stroke: "none", d: "M0 0h24v24H0z", fill: "none" }),
     /* @__PURE__ */ jsx("line", { x1: "5", y1: "12", x2: "19", y2: "12" }),
+    /* @__PURE__ */ jsx("line", { x1: "15", y1: "16", x2: "19", y2: "12" }),
+    /* @__PURE__ */ jsx("line", { x1: "15", y1: "8", x2: "19", y2: "12" })
+  ] }),
+  tablerIconProps
+);
+var FortifyDoubleArrowIcon = createIcon(
+  /* @__PURE__ */ jsxs("g", { strokeWidth: "1.5", children: [
+    /* @__PURE__ */ jsx("path", { stroke: "none", d: "M0 0h24v24H0z", fill: "none" }),
+    /* @__PURE__ */ jsx("line", { x1: "5", y1: "12", x2: "19", y2: "12" }),
+    /* @__PURE__ */ jsx("line", { x1: "9", y1: "16", x2: "5", y2: "12" }),
+    /* @__PURE__ */ jsx("line", { x1: "9", y1: "8", x2: "5", y2: "12" }),
     /* @__PURE__ */ jsx("line", { x1: "15", y1: "16", x2: "19", y2: "12" }),
     /* @__PURE__ */ jsx("line", { x1: "15", y1: "8", x2: "19", y2: "12" })
   ] }),
@@ -9625,7 +9636,7 @@ var exportCanvas = async (type, elements, appState, files, {
     let blob = canvasToBlob(tempCanvas);
     if (appState.exportEmbedScene) {
       blob = blob.then(
-        (blob2) => import("./data/image-3G72XAPB.js").then(
+        (blob2) => import("./data/image-ICV542YA.js").then(
           ({ encodePngMetadata: encodePngMetadata2 }) => encodePngMetadata2({
             blob: blob2,
             metadata: serializeAsJSON(elements, appState, files, "local")
@@ -16761,6 +16772,7 @@ var FORTIFY_TOOLBAR_ORDER_NO_HAND = [
   "eraser",
   "line",
   "arrow",
+  "fortifyArrowDouble",
   "text",
   "image"
 ];
@@ -16870,6 +16882,17 @@ var getFortifyToolbarToolsWithoutHand = () => {
         icon: LassoIcon,
         value: "lasso",
         key: KEYS35.V,
+        numericKey: null,
+        fillable: true,
+        toolbar: true
+      });
+      continue;
+    }
+    if (value === "fortifyArrowDouble") {
+      list.push({
+        icon: FortifyDoubleArrowIcon,
+        value: "fortifyArrowDouble",
+        key: null,
         numericKey: null,
         fillable: true,
         toolbar: true
@@ -17826,6 +17849,8 @@ var ShapesSwitcher = ({
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected = isFullStylesPanel && activeTool.type === "lasso" && app.state.preferredSelectionTool.type !== "lasso";
   const embeddableToolSelected = activeTool.type === "embeddable";
+  const fortifyArrowSingleSelected = isFortifyWB && activeTool.type === "arrow" && app.state.currentItemStartArrowhead == null && app.state.currentItemEndArrowhead === "arrow";
+  const fortifyArrowDoubleSelected = isFortifyWB && activeTool.type === "arrow" && app.state.currentItemStartArrowhead === "arrow" && app.state.currentItemEndArrowhead === "arrow";
   const { TTDDialogTriggerTunnel } = useTunnels();
   return /* @__PURE__ */ jsxs43(Fragment10, { children: [
     getToolbarTools(app).map(
@@ -17837,6 +17862,14 @@ var ShapesSwitcher = ({
         const letter = key && capitalizeString2(typeof key === "string" ? key : key[0]);
         const shortcut = letter ? `${letter} ${t("helpDialog.or")} ${numericKey}` : `${numericKey}`;
         const keybindingLabel = value === "hand" ? void 0 : numericKey || letter;
+        let isChecked = activeTool.type === value;
+        if (isFortifyWB && value === "arrow") {
+          isChecked = fortifyArrowSingleSelected;
+        }
+        if (isFortifyWB && value === "fortifyArrowDouble") {
+          isChecked = fortifyArrowDoubleSelected;
+        }
+        const titleBase = letter || numericKey != null ? `${capitalizeString2(label)} \u2014 ${shortcut}` : capitalizeString2(label);
         if (!isFortifyWB && (value === "selection" || value === "lasso") && isCompactStylesPanel) {
           return /* @__PURE__ */ jsx76(
             ToolPopover,
@@ -17870,9 +17903,9 @@ var ShapesSwitcher = ({
             className: clsx35("Shape", { fillable }),
             type: "radio",
             icon,
-            checked: activeTool.type === value,
+            checked: isChecked,
             name: "editor-current-shape",
-            title: `${capitalizeString2(label)} \u2014 ${shortcut}`,
+            title: titleBase,
             keyBindingLabel: keybindingLabel,
             "aria-label": capitalizeString2(label),
             "aria-keyshortcuts": shortcut,
@@ -39526,7 +39559,22 @@ var App = class _App extends React46.Component {
         );
         return;
       }
-      const nextActiveTool = updateActiveTool8(this.state, tool);
+      let effectiveTool = tool;
+      let fortifyArrowHeadPreset = null;
+      if (tool.type !== "custom" && this.props.fortifyWhiteboard && tool.type === "fortifyArrowDouble") {
+        effectiveTool = { ...tool, type: "arrow" };
+        fortifyArrowHeadPreset = "double";
+      } else if (tool.type !== "custom" && this.props.fortifyWhiteboard && tool.type === "arrow") {
+        fortifyArrowHeadPreset = "single";
+      }
+      const fortifyArrowHeads = this.props.fortifyWhiteboard && fortifyArrowHeadPreset === "double" ? {
+        currentItemStartArrowhead: "arrow",
+        currentItemEndArrowhead: "arrow"
+      } : this.props.fortifyWhiteboard && fortifyArrowHeadPreset === "single" ? {
+        currentItemStartArrowhead: null,
+        currentItemEndArrowhead: "arrow"
+      } : {};
+      const nextActiveTool = updateActiveTool8(this.state, effectiveTool);
       if (nextActiveTool.type === "hand") {
         setCursor(this.interactiveCanvas, CURSOR_TYPE4.GRAB);
       } else if (!isHoldingSpace) {
@@ -39558,6 +39606,7 @@ var App = class _App extends React46.Component {
           return {
             ...prevState,
             ...commonResets,
+            ...fortifyArrowHeads,
             activeTool: nextActiveTool,
             ...keepSelection ? {} : {
               selectedElementIds: makeNextSelectedElementIds3({}, prevState),
@@ -39570,6 +39619,7 @@ var App = class _App extends React46.Component {
           return {
             ...prevState,
             ...commonResets,
+            ...fortifyArrowHeads,
             activeTool: nextActiveTool,
             selectedElementIds: makeNextSelectedElementIds3({}, prevState),
             selectedGroupIds: makeNextSelectedElementIds3({}, prevState),
@@ -39580,6 +39630,7 @@ var App = class _App extends React46.Component {
         return {
           ...prevState,
           ...commonResets,
+          ...fortifyArrowHeads,
           activeTool: nextActiveTool
         };
       });
@@ -40804,10 +40855,11 @@ var App = class _App extends React46.Component {
         }
       } else if (this.state.activeTool.type === "text") {
         this.handleTextOnPointerDown(event, pointerDownState);
-      } else if (this.state.activeTool.type === "arrow" || this.state.activeTool.type === "line") {
+      } else if (this.state.activeTool.type === "arrow" || this.state.activeTool.type === "line" || this.state.activeTool.type === "fortifyArrowDouble") {
+        const linearToolType = this.state.activeTool.type === "fortifyArrowDouble" ? "arrow" : this.state.activeTool.type;
         this.handleLinearElementOnPointerDown(
           event,
-          this.state.activeTool.type,
+          linearToolType,
           pointerDownState
         );
       } else if (this.state.activeTool.type === "freedraw") {

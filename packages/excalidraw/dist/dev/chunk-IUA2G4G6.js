@@ -4519,6 +4519,7 @@ var AllowedExcalidrawActiveTools = {
   line: true,
   image: true,
   arrow: true,
+  fortifyArrowDouble: true,
   freedraw: true,
   eraser: false,
   custom: true,
@@ -5081,7 +5082,7 @@ var parseFileContents = async (blob) => {
   let contents;
   if (blob.type === MIME_TYPES6.png) {
     try {
-      return await (await import("./data/image-3G72XAPB.js")).decodePngMetadata(blob);
+      return await (await import("./data/image-ICV542YA.js")).decodePngMetadata(blob);
     } catch (error) {
       if (error.message === "INVALID") {
         throw new ImageSceneDataError(
@@ -5515,4 +5516,4 @@ export {
   createFile,
   normalizeFile
 };
-//# sourceMappingURL=chunk-2HWB65ZT.js.map
+//# sourceMappingURL=chunk-IUA2G4G6.js.map

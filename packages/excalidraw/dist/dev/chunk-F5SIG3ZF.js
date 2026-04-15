@@ -313,6 +313,7 @@ var toolBar = {
   diamond: "Diamond",
   ellipse: "Ellipse",
   arrow: "Arrow",
+  fortifyArrowDouble: "Arrow (both ends)",
   line: "Line",
   freedraw: "Draw",
   text: "Text",
@@ -822,4 +823,4 @@ export {
   fortifyWhiteboard,
   en_default
 };
-//# sourceMappingURL=chunk-FLLHPF7Y.js.map
+//# sourceMappingURL=chunk-F5SIG3ZF.js.map

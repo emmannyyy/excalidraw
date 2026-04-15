@@ -1,6 +1,7 @@
+import { FortifyDoubleArrowIcon } from "./icons";
 import type { AppClassProperties } from "../types";
 /** Main dock tools when `fortifyWhiteboard` is enabled (hand is rendered separately in LayerUI). */
-export declare const FORTIFY_TOOLBAR_ORDER_NO_HAND: readonly ["selection", "lasso", "freedraw", "eraser", "line", "arrow", "text", "image"];
+export declare const FORTIFY_TOOLBAR_ORDER_NO_HAND: readonly ["selection", "lasso", "freedraw", "eraser", "line", "arrow", "fortifyArrowDouble", "text", "image"];
 export declare const SHAPES: readonly [{
     readonly icon: import("react/jsx-runtime").JSX.Element;
     readonly value: "hand";
@@ -86,6 +87,17 @@ export declare const SHAPES: readonly [{
     readonly fillable: false;
     readonly toolbar: false;
 }];
+type ToolbarShape = (typeof SHAPES)[number];
+/** Fortify-only dock entry; `value` is not in upstream SHAPES. */
+export type FortifyDoubleArrowToolbarItem = {
+    icon: typeof FortifyDoubleArrowIcon;
+    value: "fortifyArrowDouble";
+    key: null;
+    numericKey: null;
+    fillable: boolean;
+    toolbar: boolean;
+};
+export type ToolbarToolItem = ToolbarShape | FortifyDoubleArrowToolbarItem;
 export declare const getToolbarTools: (app: AppClassProperties) => readonly [{
     readonly icon: import("react/jsx-runtime").JSX.Element;
     readonly value: "hand";
@@ -170,91 +182,7 @@ export declare const getToolbarTools: (app: AppClassProperties) => readonly [{
     readonly numericKey: null;
     readonly fillable: false;
     readonly toolbar: false;
-}] | ({
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "hand";
-    readonly key: "h";
-    readonly numericKey: null;
-    readonly fillable: false;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "selection";
-    readonly key: "v";
-    readonly numericKey: "1";
-    readonly fillable: true;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "rectangle";
-    readonly key: "r";
-    readonly numericKey: "2";
-    readonly fillable: true;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "diamond";
-    readonly key: "d";
-    readonly numericKey: "3";
-    readonly fillable: true;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "ellipse";
-    readonly key: "o";
-    readonly numericKey: "4";
-    readonly fillable: true;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "arrow";
-    readonly key: "a";
-    readonly numericKey: "5";
-    readonly fillable: true;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "line";
-    readonly key: "l";
-    readonly numericKey: "6";
-    readonly fillable: true;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "freedraw";
-    readonly key: readonly ["p", "x"];
-    readonly numericKey: "7";
-    readonly fillable: false;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "text";
-    readonly key: "t";
-    readonly numericKey: "8";
-    readonly fillable: false;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "image";
-    readonly key: null;
-    readonly numericKey: "9";
-    readonly fillable: false;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "eraser";
-    readonly key: "e";
-    readonly numericKey: "0";
-    readonly fillable: false;
-    readonly toolbar: true;
-} | {
-    readonly icon: import("react/jsx-runtime").JSX.Element;
-    readonly value: "laser";
-    readonly key: "k";
-    readonly numericKey: null;
-    readonly fillable: false;
-    readonly toolbar: false;
-})[] | readonly [{
+}] | ToolbarToolItem[] | readonly [{
     readonly value: "lasso";
     readonly icon: import("react/jsx-runtime").JSX.Element;
     readonly key: "v";
@@ -346,4 +274,5 @@ export declare const getToolbarTools: (app: AppClassProperties) => readonly [{
     readonly fillable: false;
     readonly toolbar: false;
 })[]];
-export declare const findShapeByKey: (key: string, app: AppClassProperties) => "line" | "arrow" | "text" | "selection" | "rectangle" | "diamond" | "ellipse" | "image" | "freedraw" | "lasso" | "eraser" | "hand" | "laser" | null;
+export declare const findShapeByKey: (key: string, app: AppClassProperties) => "line" | "arrow" | "text" | "selection" | "rectangle" | "diamond" | "ellipse" | "image" | "freedraw" | "lasso" | "fortifyArrowDouble" | "eraser" | "hand" | "laser" | null;
+export {};

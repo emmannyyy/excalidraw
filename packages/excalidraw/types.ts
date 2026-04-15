@@ -147,6 +147,8 @@ export type ToolType =
   | "diamond"
   | "ellipse"
   | "arrow"
+  /** Fortify embed only: selects the arrow tool with heads on both ends (see App.setActiveTool). */
+  | "fortifyArrowDouble"
   | "line"
   | "freedraw"
   | "text"

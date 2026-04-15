@@ -1128,6 +1128,18 @@ export const ShapesSwitcher = ({
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
+  const fortifyArrowSingleSelected =
+    isFortifyWB &&
+    activeTool.type === "arrow" &&
+    app.state.currentItemStartArrowhead == null &&
+    app.state.currentItemEndArrowhead === "arrow";
+
+  const fortifyArrowDoubleSelected =
+    isFortifyWB &&
+    activeTool.type === "arrow" &&
+    app.state.currentItemStartArrowhead === "arrow" &&
+    app.state.currentItemEndArrowhead === "arrow";
+
   const { TTDDialogTriggerTunnel } = useTunnels();
 
   return (
@@ -1154,6 +1166,19 @@ export const ShapesSwitcher = ({
             : `${numericKey}`;
           const keybindingLabel =
             value === "hand" ? undefined : numericKey || letter;
+
+          let isChecked = activeTool.type === value;
+          if (isFortifyWB && value === "arrow") {
+            isChecked = fortifyArrowSingleSelected;
+          }
+          if (isFortifyWB && value === "fortifyArrowDouble") {
+            isChecked = fortifyArrowDoubleSelected;
+          }
+
+          const titleBase =
+            letter || numericKey != null
+              ? `${capitalizeString(label)} — ${shortcut}`
+              : capitalizeString(label);
 
           // when in compact styles panel mode (tablet)
           // use a ToolPopover for selection/lasso toggle as well
@@ -1197,9 +1222,9 @@ export const ShapesSwitcher = ({
               key={value}
               type="radio"
               icon={icon}
-              checked={activeTool.type === value}
+              checked={isChecked}
               name="editor-current-shape"
-              title={`${capitalizeString(label)} — ${shortcut}`}
+              title={titleBase}
               keyBindingLabel={keybindingLabel}
               aria-label={capitalizeString(label)}
               aria-keyshortcuts={shortcut}

@@ -6,6 +6,7 @@ import {
   DiamondIcon,
   EllipseIcon,
   ArrowIcon,
+  FortifyDoubleArrowIcon,
   LineIcon,
   FreedrawIcon,
   TextIcon,
@@ -26,6 +27,7 @@ export const FORTIFY_TOOLBAR_ORDER_NO_HAND = [
   "eraser",
   "line",
   "arrow",
+  "fortifyArrowDouble",
   "text",
   "image",
 ] as const;
@@ -131,8 +133,20 @@ export const SHAPES = [
 
 type ToolbarShape = (typeof SHAPES)[number];
 
-const getFortifyToolbarToolsWithoutHand = (): ToolbarShape[] => {
-  const list: ToolbarShape[] = [];
+/** Fortify-only dock entry; `value` is not in upstream SHAPES. */
+export type FortifyDoubleArrowToolbarItem = {
+  icon: typeof FortifyDoubleArrowIcon;
+  value: "fortifyArrowDouble";
+  key: null;
+  numericKey: null;
+  fillable: boolean;
+  toolbar: boolean;
+};
+
+export type ToolbarToolItem = ToolbarShape | FortifyDoubleArrowToolbarItem;
+
+const getFortifyToolbarToolsWithoutHand = (): ToolbarToolItem[] => {
+  const list: ToolbarToolItem[] = [];
   for (const value of FORTIFY_TOOLBAR_ORDER_NO_HAND) {
     if (value === "lasso") {
       list.push({
@@ -142,7 +156,18 @@ const getFortifyToolbarToolsWithoutHand = (): ToolbarShape[] => {
         numericKey: null,
         fillable: true,
         toolbar: true,
-      } as unknown as ToolbarShape);
+      } as unknown as ToolbarToolItem);
+      continue;
+    }
+    if (value === "fortifyArrowDouble") {
+      list.push({
+        icon: FortifyDoubleArrowIcon,
+        value: "fortifyArrowDouble",
+        key: null,
+        numericKey: null,
+        fillable: true,
+        toolbar: true,
+      });
       continue;
     }
     const found = SHAPES.find((s) => s.value === value);
